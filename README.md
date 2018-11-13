@@ -2,7 +2,16 @@
 To examine which are the factors which influene,  Customer Lifetime Value (CLV) of Insurance Premium Company, based on the given attributes of the customer.
 
 # Business Context:
-What are the  attributes of customer, who have a higher Customer Lifetime Value.
+What are the  attributes of customer, who have a higher Customer Lifetime Value.Customer Lifetime Value (CLV) is a prediction of the net profit attributed to the future relationship with a customer.
+
+“The purpose of a business is to create and keep a customer.” Which pretty much sums up the value of Customer Lifetime Value (CLV) .
+
+CLV helps make important business decisions about sales, marketing, product development, and customer support. For example:
+
+Marketing: How much should I spend to acquire a customer?
+Product: How can I offer products and services tailored for my best customers?
+Customer Support: How much should I spend to service and retain a customer?
+Sales: What types of customers should sales reps spend the most time on trying to acquire?
 
 # Description of Variables:
 The dataset contains 9134 observations and 24 variables,Where Customer.Llifetime.Value is the dependent variable.
@@ -243,4 +252,115 @@ data:  FinalModel
 BP = 332.68, df = 13, p-value < 2.2e-16
 
 AS P-VALUE>0.05 SO THERE IS PRESENCE OF HOMOSCEDACITY AND WE ACCEPT OUR NULL HYPOTHESIS.
+
+ALSO MAPE=34.6 SO OUR FORECAST IS OFF BY 34.6%.
+
+NOW WE WILL TEST THE DATA ON TEST DATA.AGAIN I USED BACK WARD ELIMINATION METHOD TO GET THE VARIABLES WHICH ARE  STATISTICALLY SIGNIFICANT.
+
+After deleting the variables one by one i left with variables:
+1.I(Coverage==Premium)
+2.I(EmploymentStatus=="Unemployed")
+3.Monthly.Premium.Auto
+4.Number.of.Policies
+5.Renew.offer.Typeoffer2
+6.Renew.offer.Typeoffer3
+7.Renew.offer.Typeoffer4
+8.I(Vehicle.Class=="SUV")
+
+Coefficients:
+                                        Estimate Std. Error t value Pr(>|t|)    
+(Intercept)                             2088.093    223.384   9.348  < 2e-16 ***
+I(Coverage == "Premium")TRUE            1140.732    213.470   5.344 9.96e-08 ***
+I(EmploymentStatus == "Unemployed")TRUE -533.486    116.743  -4.570 5.13e-06 ***
+Monthly.Premium.Auto                      34.320      2.384  14.397  < 2e-16 ***
+Number.of.Policies                       347.004     20.456  16.963  < 2e-16 ***
+Renew.Offer.TypeOffer2                  -582.644    119.283  -4.885 1.10e-06 ***
+Renew.Offer.TypeOffer3                  -436.824    149.576  -2.920 0.003528 ** 
+Renew.Offer.TypeOffer4                  -582.946    168.283  -3.464 0.000541 ***
+I(Vehicle.Class == "SUV")TRUE            965.445    156.246   6.179 7.55e-10 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 2445 on 2408 degrees of freedom
+Multiple R-squared:  0.3015,	Adjusted R-squared:  0.2992 
+F-statistic: 129.9 on 8 and 2408 DF,  p-value: < 2.2e-16
+
+NOW WE WILL DO MODEL DIAGONSTICS
+1.TEST FOR MULTICOLLINEARITY
+THERE SHOULD BE NO LINEAR RELATIONSHIP BETWEEN THE INDEPENDENT VARIABLES.MULTICOLLINEARITY IS CHECKED BY VIF(VARIANCE INFLATION FACTOR)
+FUNCTION AND VIF>1.7.
+
+I(Coverage == "Premium")            1.334346  1        1.155139
+I(EmploymentStatus == "Unemployed") 1.025935  1        1.012885
+Monthly.Premium.Auto                1.768128  1        1.329710
+Number.of.Policies                  1.009904  1        1.004940
+Renew.Offer.Type                    1.053009  3        1.008646
+I(Vehicle.Class == "SUV")           1.500516  1        1.224956
+ 
+ AS WE CAN SEE ALL THE VARIABLES ARE LESS THAN 1.7.SO THERE IS NO MULTICOLLINEARITY.
+
+2.TEST FOR AUTOCORRELATION
+THERE SHOULD NOT BE ANY CORRELATION BETWEEN ERROR TERMS.TO CHECK THIS ASSUMPTION WE USE DURBIN WATSON TEST.ON PERFORMING THE TEST WE GET THE FOLLOWING OUTPUT 
+
+lag Autocorrelation D-W Statistic p-value
+   1     0.003418927      1.992809   0.894
+ Alternative hypothesis: rho != 0
+
+DURBIN WATSON TEST
+H0:THERE IS NO AUTOCORRELATION BETWEEN ERROR TERMS
+H1:THERE IS AUTOCORREATION BETWEEN ERROR TERMS
+   
+AS WE CAN SEE THAT THAT D-W STATISTIC=2 AND P-VALUE IS ALSO GREATER THAN 0.05.SO THERE IS NO AUTOCORELATION BETWEEN ERROR TERMS.
+
+3.TEST FOR NORMALITY
+THE ERROR TERMS SHOULD BE NORMALLY DISTRIBUTED.SO WE TEST THE NORMALITY OF RESIDUALS USING ANDERSON DARLING(A-D) TEST.THE P-VALUE SHOULD BE MORE THAN 0.05.
+
+ANDERSON DARLING TEST
+H0:THE ERROR TERMS ARE NORMALLY DISTRIBUTED
+H1:THE ERROR TERMS ARE NOT NORMALLY DISTRIBUTED
+IF P-VALUE>0.05 WE ACCEPT THE NULL HYPOTHESIS
+IF P-VALUE<0.05 WE ACCEPT THE ALTERNATIVE HYPOTHESIS
+
+ad.test(resids) #get Anderson-Darling test for normality 
+
+Anderson-Darling normality test
+
+data:  resids1
+A = 121.28, p-value < 2.2e-16
+
+AS P-VALUE>0.05 SO THE ERROR TERMS ARE NORMALLY DISTRIBUTED
+
+4.TEST OF HOMOSCEDACITY
+THE VARIANCE OF RESIDUAL SHOULD BE CONSTANT AND P-VALUE SHOULD BE MORE THAN 0.05.WE TEST THE HOMOSCEDACITY USING BP TEST 
+BP TEST
+H0:THE VARIANCE OF RESIDUAL IS CONSTANT
+H1:THE VARIANCE OF RESIDUAL IS NOT CONSTANT
+IF P-VALUE>0.05 WE ACCEPT THE NULL HYPOTHESIS
+IF P-VALUE<0.05 WE ACCEPT THE ALTERNATIVE HYPOTHESIS
+
+studentized Breusch-Pagan test
+
+data:  fit5
+BP = 150.56, df = 8, p-value < 2.2e-16
+
+AS P-VALUE>0.05 SO THERE IS PRESENCE OF HOMOSCEDACITY AND WE ACCEPT OUR NULL HYPOTHESIS.
+
+ALSO MAPE=36.29 SO OUR FORECAST IS OFF BY 36.29%.
+
+REGRESSION EQUATION:
+clv=1140.732*I(Coverage=="Premium")-533.486*I(EmploymentStatus=="Unemployed")+34.320*Monthly.Premium.Auto+347.004*Number.of.Policies-582.644*Renew.OfferTypeOffer2-436.824*Renew.OfferTypeOffer3-582.946*Renew.OfferTypeOffer3+965.445*I(Vehicle.Class=="suv")
+
+Interpretation:
+1.If coverage which is of premium type increases by 1 unit then clv will also increase by 1140.732 units.
+2.If Employment status is unemployed then clv will decreases by 533.486 units.
+3.If monthly.premium.auto increases by 1 unit then clv increases by 34.320 units.
+4.If Number.of.policies increases by 1 unit then clv increases by 347.004 units.
+5.If Customer renew its level to  offer2 then clv decreases by 582.644 units.
+6.If Customer renew its level to  offer3 then clv decreases by 436.824 units.
+7.If Customer renew its level to  offer4 then clv decreases by 582.946 units.
+8.If vehicle class =suv then clv increases by 965.445 units.
+
+
+
+
 
