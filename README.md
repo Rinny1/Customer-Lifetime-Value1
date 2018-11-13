@@ -135,5 +135,112 @@ high school or below may be more valuable.
 NEXT STEP IS TO DIVIDE THE DATA INTO TRAIN AND TEST.WE WILL USE 70% OF OUR DATA AS TRAINNING DATA AND 30% AS TEST DATA.
 WE WILL FIRST DO MODELLING ON TRAIN DATA AND TEST IT ON TEST DATA.
 
-#WE WILL START OUR MODELLING WITH ALL THE VARIABLES AND THEN WE USED BY BACK WARD ELIMINATION TO GET THE VARIABLES WHICH ARE  SIGNIFICANT P-VALUES.
+#WE WILL START OUR MODELLING WITH ALL THE VARIABLES USING TRAIN DATA AND I USED BACK WARD ELIMINATION METHOD TO GET THE VARIABLES WHICH ARE  STATISTICALLY SIGNIFICANT.
+
+After deleting the variables one by one i left with variables:
+1.I(Coverage==Premium)
+2.I(Coverage=Extended)
+3.I(Education=="High School or Below")
+4.I(Education=="College")
+5.I(EmploymentStatus=="Medical Leave")
+6.I(EmploymentStatus=="Unemployed")
+7.Monthly.Premium.Auto
+8.Number.of.Open.Complaints
+9.Number.of.Policies
+10.Renew.offer.Typeoffer2
+11.Renew.offer.Typeoffer3
+12.Renew.offer.Typeoffer4
+13.I(Vehicle.Class=="SUV")
+
+# OUTPUT
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-3637.3 -1678.5  -811.4   831.8  9960.2 
+
+Coefficients:
+                                           Estimate Std. Error t value Pr(>|t|)    
+(Intercept)                                2043.626    136.345  14.989  < 2e-16 ***
+CoverageExtended                            293.083     75.623   3.876 0.000108 ***
+CoveragePremium                             840.304    132.784   6.328 2.67e-10 ***
+I(Education == "College")TRUE               202.578     75.359   2.688 0.007206 ** 
+I(Education == "High School or Below")TRUE  183.244     76.632   2.391 0.016824 *  
+I(EmploymentStatus == "Medical Leave")TRUE -339.659    151.532  -2.241 0.025033 *  
+I(EmploymentStatus == "Unemployed")TRUE    -565.383     73.510  -7.691 1.71e-14 ***
+Monthly.Premium.Auto                         33.363      1.405  23.738  < 2e-16 ***
+Number.of.Open.Complaints                  -116.923     33.830  -3.456 0.000552 ***
+Number.of.Policies                          343.542     12.637  27.185  < 2e-16 ***
+Renew.Offer.TypeOffer2                     -567.747     75.527  -7.517 6.48e-14 ***
+Renew.Offer.TypeOffer3                     -317.843     94.070  -3.379 0.000733 ***
+Renew.Offer.TypeOffer4                     -590.627    107.386  -5.500 3.96e-08 ***
+I(Vehicle.Class == "SUV")TRUE               681.191     96.172   7.083 1.58e-12 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 2355 on 5625 degrees of freedom
+Multiple R-squared:  0.3104,	Adjusted R-squared:  0.3088 
+F-statistic: 194.8 on 13 and 5625 DF,  p-value: < 2.2e-16
+
+NOW WE WILL DO MODEL DIAGONSTICS
+1.TEST FOR MULTICOLLINEARITY
+THERE SHOULD BE NO LINEAR RELATIONSHIP BETWEEN THE INDEPENDENT VARIABLES.MULTICOLLINEARITY IS CHECKED BY VIF(VARIANCE INFLATION FACTOR)
+FUNCTION AND VIF>1.7.
+
+vif(FinalModel)
+Coverage                               1.464857  2        1.100142
+I(Education == "College")              1.203677  1        1.097122
+I(Education == "High School or Below") 1.215781  1        1.102625
+I(EmploymentStatus == "Medical Leave") 1.023492  1        1.011678
+I(EmploymentStatus == "Unemployed")    1.052779  1        1.026050
+Monthly.Premium.Auto                   1.849413  1        1.359931
+Number.of.Open.Complaints              1.008155  1        1.004069
+Number.of.Policies                     1.020722  1        1.010308
+Renew.Offer.Type                       1.066207  3        1.010742
+I(Vehicle.Class == "SUV")              1.414055  1        1.189140
+
+AS WE CAN SEE ALL THE VARIABLES ARE LESS THAN 1.7.SO THERE IS NO MULTICOLLINEARITY.
+
+2.TEST FOR AUTOCORRELATION
+THERE SHOULD NOT BE ANY CORRELATION BETWEEN ERROR TERMS.TO CHECK THIS ASSUMPTION WE USE DURBIN WATSON TEST.ON PERFORMING THE TEST WE GET THE FOLLOWING OUTPUT 
+
+durbinWatsonTest(FinalModel)
+lag Autocorrelation D-W Statistic p-value
+   1     -0.02102495       2.04184   0.108
+
+DURBIN WATSON TEST
+H0:THERE IS NO AUTOCORRELATION BETWEEN ERROR TERMS
+H1:THERE IS AUTOCORREATION BETWEEN ERROR TERMS
+   
+AS WE CAN SEE THAT THAT D-W STATISTIC=2 AND P-VALUE IS ALSO GREATER THAN 0.05.SO THERE IS NO AUTOCORELATION BETWEEN ERROR TERMS.
+
+3.TEST FOR NORMALITY
+THE ERROR TERMS SHOULD BE NORMALLY DISTRIBUTED.SO WE TEST THE NORMALITY OF RESIDUALS USING ANDERSON DARLING(A-D) TEST.THE P-VALUE SHOULD BE MORE THAN 0.05.
+
+ANDERSON DARLING TEST
+H0:THE ERROR TERMS ARE NORMALLY DISTRIBUTED
+H1:THE ERROR TERMS ARE NOT NORMALLY DISTRIBUTED
+IF P-VALUE>0.05 WE ACCEPT THE NULL HYPOTHESIS
+IF P-VALUE<0.05 WE ACCEPT THE ALTERNATIVE HYPOTHESIS
+
+ad.test(resids) #get Anderson-Darling test for normality 
+
+Anderson-Darling normality test
+
+data:  resids
+A = 278.18, p-value < 2.2e-16
+AS P-VALUE>0.05 SO THE ERROR TERMS ARE NORMALLY DISTRIBUTED
+
+4.TEST OF HOMOSCEDACITY
+THE VARIANCE OF RESIDUAL SHOULD BE CONSTANT AND P-VALUE SHOULD BE MORE THAN 0.05.WE TEST THE HOMOSCEDACITY USING BP TEST 
+BP TEST
+H0:THE VARIANCE OF RESIDUAL IS CONSTANT
+H1:THE VARIANCE OF RESIDUAL IS NOT CONSTANT
+IF P-VALUE>0.05 WE ACCEPT THE NULL HYPOTHESIS
+IF P-VALUE<0.05 WE ACCEPT THE ALTERNATIVE HYPOTHESIS
+
+studentized Breusch-Pagan test
+
+data:  FinalModel
+BP = 332.68, df = 13, p-value < 2.2e-16
+
+AS P-VALUE>0.05 SO THERE IS PRESENCE OF HOMOSCEDACITY AND WE ACCEPT OUR NULL HYPOTHESIS.
 
